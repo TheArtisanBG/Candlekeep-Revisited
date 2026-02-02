@@ -21,7 +21,7 @@ END
 CHAIN C0CR#ARK C0CandleReArkanis.1
 ~Anything I need, eh? Well... let me think...~
 == C0CR#ARK ~Well, Deder and I get awfully bored standing guard all day with nothing to do. We like to read to pass the time, but the castle doors are locked right now, so... could you go over to Winthrop's and ask to borrow a couple of books? We're on duty right now, so we can't go wandering off.~
-== %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ ~You like to read, Arkanis? How come I've never heard you said anything about that before?~
+== %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ ~You like to read, Arkanis? How come I've never heard you say anything about that before?~
 == C0CR#ARK IF ~IsValidForPartyDialog("%bg1_imoen%")~ ~Well... I'm nowhere near as good at it as you, Imoen. But I've been in Candlekeep for a while, so I can't help but take an interest in books after all the years. Makes it worth leaving my clanhold for, having learned so many new things.~
 == C0CR#DED ~Whatever you can get us is fine. Make sure they've got lots of pages, though. We'll need them for a while.~
 DO ~AddJournalEntry(%Quest3_Entry_1%,QUEST)~ EXIT

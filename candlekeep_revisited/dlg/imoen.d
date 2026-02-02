@@ -1,6 +1,6 @@
-ADD_TRANS_TRIGGER GORION 0 ~!IsValidForPartyDialog("%bg1_imoen%")~ DO 0
+ADD_TRANS_TRIGGER GORION 0 ~OR(3) !InParty("%bg1_imoen%") !InMyArea("%bg1_imoen%") StateCheck("%bg1_imoen%",CD_STATE_NOTVALID)~ DO 0
 EXTEND_TOP GORION 0
-+ ~IsValidForPartyDialog("%bg1_imoen%")~ + ~I'm ready to go right now.~ EXTERN %bg1_imoen_dlg% C0CandleReImoenFarewell
++ ~InParty("%bg1_imoen%") InMyArea("%bg1_imoen%") !StateCheck("%bg1_imoen%",CD_STATE_NOTVALID)~ + ~I'm ready to go right now.~ EXTERN %bg1_imoen_dlg% C0CandleReImoenFarewell
 END
 
 CHAIN %bg1_imoen_dlg% C0CandleReImoenFarewell
