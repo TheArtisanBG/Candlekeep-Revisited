@@ -38,22 +38,6 @@ END ELSE BEGIN
 
 	END
 
-ACTION_IF (MOD_IS_INSTALLED ~SHADOWADEPT/SHADOWADEPT.TP2~ ~0~) THEN BEGIN
-
-ACTION_IF (MOD_IS_INSTALLED ~EEEX/EEEX.TP2~ ~0~) THEN BEGIN
-
-OUTER_TEXT_SPRINT %is_shadow_adept_player1% ~CheckStatGT(Player1,0,IS_SHADOW_ADEPT)~
-
-END ELSE BEGIN
-
-OUTER_TEXT_SPRINT %is_shadow_adept_player1% ~Specifics(Player1,SHADOW_ADEPT)~
-
-END
-
-EXTEND_TOP ~%bg1_eet_symbol%2600.bcs~ ~%MOD_FOLDER%/bcs/ar2600-shadowadept.baf~ EVAL
-
-END
-
 EXTEND_TOP ~%bg1_eet_symbol%2600.bcs~ ~%MOD_FOLDER%/bcs/ar2600-intro.baf~ EVAL
 
 ACTION_IF FILE_EXISTS_IN_GAME ~C0CLABWL.2DA~ THEN BEGIN
@@ -154,4 +138,20 @@ Requires:
  4 Strength
 
 Weight: 5~
+END
+
+ACTION_IF (MOD_IS_INSTALLED ~SHADOWADEPT/SHADOWADEPT.TP2~ ~0~) THEN BEGIN
+
+ACTION_IF (MOD_IS_INSTALLED ~EEEX/EEEX.TP2~ ~0~) THEN BEGIN
+
+OUTER_TEXT_SPRINT %is_shadow_adept_player1% ~CheckStatGT(Player1,0,IS_SHADOW_ADEPT)~
+
+END ELSE BEGIN
+
+OUTER_TEXT_SPRINT %is_shadow_adept_player1% ~Specifics(Player1,SHADOW_ADEPT)~
+
+END
+
+EXTEND_TOP ~%bg1_eet_symbol%2600.bcs~ ~%MOD_FOLDER%/bcs/ar2600-shadowadept.baf~ EVAL
+
 END
