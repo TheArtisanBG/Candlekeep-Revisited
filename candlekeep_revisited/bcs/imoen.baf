@@ -40,3 +40,11 @@ THEN
 	DestroySelf()
 END
 	
+IF
+	InParty(Myself)
+	Global("C0CandleReImoenJoins","GLOBAL",4)
+THEN
+  RESPONSE #100
+	SetGlobal("C0CandleReImoenJoins","GLOBAL",5)
+	MakeGlobalOverride()
+  END
