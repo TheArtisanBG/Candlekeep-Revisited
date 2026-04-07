@@ -1,0 +1,15 @@
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("Gorion")  // Gorion
+        CreateCreature("cutspy",[3171.1489],S)  // No such index
+        MoveViewObject("Gorion",BD_NORMAL)  // Gorion
+        DisplayStringHead("Tamoko",~Ah—!~)
+		ActionOverride("Tamoko",ForceSpellRES("C0CR#GR2","Sarevok")
+		ForceSpellRES("C0CR#GR1","Sarevok")
+        Wait(4)
+		FaceObject("Sarevok")
+		Wait(2)
+		ActionOverride("Sarevok",StartDialogNoSet("Sarevok"))
+END

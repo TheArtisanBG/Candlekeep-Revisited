@@ -1,0 +1,16 @@
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("Gorion")  // Gorion
+        CreateCreature("cutspy",[3171.1489],S)  // No such index
+        MoveViewObject("Gorion",BD_NORMAL)  // Gorion
+        PlaySong(%dream_song%)
+        Wait(2)
+		ActionOverride(Player1,MoveToPoint([3089.1800]))
+		ActionOverride(Player1,JumpToPoint([3522.3712]))
+        Wait(4)
+		FaceObject("Sarevok")
+		Wait(2)
+		StartDialogNoSet("Sarevok")
+END

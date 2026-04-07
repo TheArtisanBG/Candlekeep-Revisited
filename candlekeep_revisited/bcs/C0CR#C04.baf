@@ -1,0 +1,215 @@
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("Gorion")  // Gorion
+        CreateCreature("cutspy",[3171.1489],S)  // No such index
+        MoveViewObject("Gorion",BD_NORMAL)  // Gorion
+        PlaySong(%bw1_song%)
+        Wait(1)
+        DisplayString(Myself,31523)  // Contingency Fired
+        ReallyForceSpell(Myself,WIZARD_MIRROR_IMAGE)  // SPWI212.SPL (Mirror Image)
+        ReallyForceSpell(Myself,WIZARD_PROTECTION_FROM_MAGIC_WEAPONS)  // SPWI611.SPL (Protection From Magical Weapons)
+        ReallyForceSpell(Myself,WIZARD_VOCALIZE)  // SPWI219.SPL (Vocalize)
+        Wait(1)
+        ActionOverride("Tamoko",Spell(Myself,CLERIC_DRAW_UPON_HOLY_MIGHT))  // SPPR214.SPL (Draw Upon Holy Might)
+        Wait(1)
+        SmallWait(4)
+        ForceSpell("Ogre",WIZARD_FLESH_TO_STONE_IGNORE_RESISTANCE)  // Ogre Berserker
+        Wait(2)
+        ActionOverride("Tamoko",ForceSpell("Gorion",CLERIC_FLAME_STRIKE))  // Gorion
+        ApplySpell("Ogre",SURE_STONE_SHATTER)  // Ogre Berserker
+        Kill("Ogre")  // Ogre Berserker
+        SmallWait(6)
+        ForceSpell(Myself,WIZARD_MIRROR_IMAGE)  // SPWI212.SPL (Mirror Image)
+        SmallWait(4)
+        ForceSpell("Ogre02",WIZARD_LIGHTNING_BOLT)  // Welt
+        SmallWait(2)
+        Kill("Ogre02")  // Welt
+        ActionOverride("Tamoko",SetSequence(SEQ_READY))
+        MoveToPointNoInterrupt([2915.1455])
+        ActionOverride("Tamoko",MoveToPointNoInterrupt([3264.1373]))
+        SmallWait(2)
+        ForceSpell(Myself,WIZARD_STONE_SKIN)  // SPWI408.SPL (Stoneskin)
+        FaceObject("Sarevok")  // Sarevok
+        ActionOverride("Tamoko",FaceObject("Gorion"))  // Gorion
+        ActionOverride("Tamoko",SetSequence(SEQ_READY))
+        SmallWait(4)
+        ForceSpell("Tamoko",WIZARD_FIREBALL)  // Tamoko
+        Wait(1)
+        Kill("gsarch02")  // Thug
+        Kill("gsarch01")  // Thug
+        FadeToColor([20.0],0)
+        ActionOverride("Tamoko",SetSequence(SEQ_DAMAGE))
+        SmallWait(2)
+        ActionOverride("Tamoko",ReallyForceSpell("Gorion",CLERIC_DISPEL_MAGIC))  // Gorion
+        Wait(3)
+        SpellNoDec("Tamoko",WIZARD_OTILUKES_RESILIENT_SPHERE)  // Tamoko
+        SmallWait(4)
+        ActionOverride("Sarevok",Attack("Gorion"))  // Gorion
+        AttackNoSound("Sarevok")  // Sarevok
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId(Player1)
+        SetAreaScript("cutskip1",OVERRIDE)
+        SetGlobal("BD_CUTSCENE_BREAKABLE","GLOBAL",3)
+        SetCutSceneBreakable(TRUE)
+        Wait(4)
+        ApplySpellRES("cuthide",Player1)  // No such index
+        Wait(7)
+        ApplySpell(Myself,RESTORE_FULL_HEALTH)  // SPIN746.SPL (No such index)
+        Wait(10)
+        ActionOverride("Sarevok",ApplyDamage("Gorion",17,SLASHING))  // Gorion
+        SmallWait(2)
+        ActionOverride("Sarevok",SetSequence(SEQ_ATTACK_SLASH))
+        ActionOverride("Sarevok",DisplayString(Myself,31524))  // Deathbringer Assault
+        SmallWait(3)
+        ActionOverride("Sarevok",ApplyDamage("Gorion",49,SLASHING))  // Gorion
+        ActionOverride("Sarevok",CreateVisualEffectObject("SPBOLTGL","Gorion"))  // Gorion
+        ScreenShake([20.20],3)
+        ActionOverride("Gorion",VerbalConstant(Myself,DYING))
+        ActionOverride("Sarevok",Kill("Gorion"))  // Gorion
+        ActionOverride("Sarevok",SetSequence(SEQ_ATTACK_SLASH))
+        StartMusic(NIGHT,FORCE)
+        Wait(3)
+        VerbalConstant("Sarevok",UNHAPPY_BREAKING_POINT)
+        Wait(1)
+        ActionOverride("Sarevok",DestroySelf())
+        ActionOverride("Tamoko",DestroySelf())
+        ActionOverride("cutspy",DestroySelf())
+        ActionOverride("bdtarget",DestroySelf())
+        Wait(4)
+        JumpToPoint([3522.3712])
+        SmallWait(4)
+        DayNight(DAWN_END)
+        Weather(NOWEATHER)
+        MoveViewPoint([3522.3712],INSTANT)
+        Kill("gsarch01")  // Thug
+        Kill("gsarch02")  // Thug
+        Kill("Ogre")  // Ogre Berserker
+        Kill("Ogre02")  // Welt
+        SmallWait(1)
+        DestroyItem("MINHP1")  // No such index
+        SetCutSceneBreakable(FALSE)
+        SetGlobal("BD_CUTSCENE_BREAKABLE","GLOBAL",0)
+        SetAreaScript("",OVERRIDE)
+        IncrementChapter("Chptxt1")
+        AddJournalEntry(16190,INFO)  // You awake with the realization that you have not been living some horrible dream. Ambushed, you saw Gorion cut down before your eyes, and even his powerful magic could not stop the onslaught. It was his wish that you flee, but that does not remove the feeling of helplessness that now overwhelms you. "Hand over your ward," the armored fiend had said. He was after you and you alone, but why? If only Gorion had given some clue, but now you are alone and lost. Candlekeep is near, but you will find no quarter there. The readers pay for their serenity with rather draconian entry rules, and without Gorion's influence, their doors will remain closed.
+        EraseJournalEntry(31438)  // Find Gorion Gorion, my foster father, has informed me that we must immediately leave Candlekeep and set out on a journey. He has given me some gold, and I must purchase supplies for the road, including weapons and armor.
+        AddJournalEntry(31439,QUEST)  // Go to the Friendly Arm Inn With Gorion slain, I must continue onward by myself. My first destination should be the Friendly Arm Inn to the north. Gorion claims that his former associates Khalid and Jaheira will be there waiting for me.
+        MoveViewObject(Player1,INSTANT)
+        FadeFromColor([4.0],0)
+        EndCutSceneMode()
+        SmallWait(4)
+        SetGlobal("BD_Chapter_Save","GLOBAL",1)
+        SaveGame(11)
+        SaveGame(0)
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("Sarevok")  // Sarevok
+        Wait(16)
+        MoveToObject("Gorion")  // Gorion
+        AttackNoSound("Gorion")  // Gorion
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("gsarch02")  // Thug
+        ChangeStat(Myself,MAXHITPOINTS,5,SET)
+        Wait(1)
+        SmallWait(6)
+        FaceObject(Player1)
+        SetSequence(SEQ_ATTACK)
+        Wait(4)
+        SmallWait(6)
+        Face(S)
+        SetSequence(SEQ_ATTACK)
+        Wait(2)
+        MoveToPoint([3343.1500])
+        Wait(1)
+        FaceObject("Gorion")  // Gorion
+        Attack("Gorion")  // Gorion
+END
+
+IF
+    !See(Player1)
+THEN
+    RESPONSE #100
+        CutSceneId("gsarch02")  // Thug
+        SmallWait(2)
+        AttackNoSound("Gorion")  // Gorion
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("gsarch01")  // Thug
+        ChangeStat(Myself,MAXHITPOINTS,5,SET)
+        Wait(5)
+        AttackNoSound("Gorion")  // Gorion
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("Tamoko")  // Tamoko
+        Wait(16)
+        AttackNoSound("Gorion")  // Gorion
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("Ogre")  // Ogre Berserker
+        Wait(8)
+        Attack("Gorion")  // Gorion
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("Ogre02")  // Welt
+        ChangeStat(Myself,MAXHITPOINTS,5,SET)
+        Wait(5)
+        Attack("Gorion")  // Gorion
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId("bdtarget")  // <NO TEXT>
+        SetName(21975)  // Thug
+        Wait(1)
+        ForceSpellPoint([3015.1486],TRAP_ARROW)  // SPWI005.SPL (No such index)
+        SmallWait(6)
+        ApplyDamage(Player1,1,PIERCING)
+        Wait(3)
+        SmallWait(6)
+        ForceSpellPoint([2865.2076],TRAP_ARROW_ICE)  // SPWI012.SPL (No such index)
+        DestroySelf()
+END
+
+IF
+    True()
+THEN
+    RESPONSE #100
+        CutSceneId(Familiar)
+        Wait(4)
+        MoveToPoint([3089.1800])
+END
+

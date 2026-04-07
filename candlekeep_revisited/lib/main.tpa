@@ -134,6 +134,9 @@ COPY_EXISTING ~imoen1.cre~ ~override/imoen.cre~
 		WRITE_ASCII DEATHVAR ~IMOEN~
 		REMOVE_CRE_ITEMS
 
+COPY_EXISTING ~SAREV1.cre~ ~override~
+  SAY UNHAPPY_BREAKING ~~ [C0CR#SAR]
+
 ACTION_IF !GAME_IS ~EET~ THEN BEGIN
 EXTEND_TOP ~imoen.bcs~ ~%MOD_FOLDER%/bcs/imoen.baf~ EVAL
 END
@@ -186,12 +189,54 @@ OUTER_SET %Quest3_Entry_1% = RESOLVE_STR_REF (@5)
 OUTER_SET %Quest3_Entry_2% = RESOLVE_STR_REF (@6)
 LOAD_TRA ~%MOD_FOLDER%/tra/%LANGUAGE%/setup.tra~
 
+DEFINE_PATCH_FUNCTION ~GET_2DA_ROW~
+	INT_VAR
+		starting_row=0
+		numcolumns=0
+		match_column=0
+		found_it=0
+	STR_VAR
+		match=~DEFA~
+	RET
+		numcols
+		matched
+BEGIN
+		COUNT_2DA_ROWS numcolumns numrows
+		FOR (i = starting_row; i < numrows; ++i) BEGIN
+			READ_2DA_ENTRY i match_column numcolumns string_to_match
+			PATCH_IF (~%string_to_match%~ STRING_EQUAL_CASE ~%match%~) BEGIN
+				matched = i
+				found_it = 1
+				i = numrows
+
+			END
+		END
+		numcols = numcolumns
+		PATCH_IF (found_it = 0) BEGIN
+			PATCH_FAIL ~GET_2DA_ROW: Could not find a row that contains %match% in column %match_column%.~
+		END
+END
+	
+COPY_EXISTING ~SONGLIST.2da~ ~override~
+	LPF GET_2DA_ROW INT_VAR numcolumns=3 match_column=2 STR_VAR match=~Dream.mus~ RET therow=matched END
+	READ_2DA_ENTRY therow 0 3 ~dream_song~
+	LPF GET_2DA_ROW INT_VAR numcolumns=3 match_column=2 STR_VAR match=~BW1.mus~ RET therow=matched END
+	READ_2DA_ENTRY therow 0 3 ~bw1_song~
+
+	OUTER_SET dream_song = dream_song
+	OUTER_SET bw1_song = bw1_song
+
 COMPILE ~%MOD_FOLDER%/bcs/c0cr#c6s.baf~
 COMPILE ~%MOD_FOLDER%/bcs/c0cr#014.baf~
 COMPILE ~%MOD_FOLDER%/bcs/c0cr#015.baf~
+COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/bcs/c0cr#c01.baf~
+COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/bcs/c0cr#c02.baf~
+COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/bcs/c0cr#c03.baf~
+COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/bcs/c0cr#c04.baf~
 
 COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/dlg/dialog.d~
 COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/dlg/imoen.d~ 
+COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/dlg/sarevok.d~
 
 COPY_EXISTING ~SCRL2L.ITM~ ~OVERRIDE/C0CR#LET.ITM~
 SAY NAME2 ~Letter from Mordaine~
@@ -255,7 +300,7 @@ SAY NAME1 #-1
 COPY_EXISTING ~SPWI052.SPL~ ~OVERRIDE/C0CR#VI3.SPL~
 SAY NAME1 #-1
 
-COPY ~%MOD_FOLDER%/SPL/C0CR#SLP.SPL~ ~OVERRIDE~
+COPY ~%MOD_FOLDER%/SPL~ ~OVERRIDE~
 
 COPY_EXISTING ~%bg1_eet_symbol%2600.are~ ~override~
  LPF fj_are_structure
