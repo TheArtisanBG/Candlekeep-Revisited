@@ -12,5 +12,5 @@ THEN
         Wait(4)
 		FaceObject("Sarevok")
 		Wait(2)
-		StartDialogNoSet("Sarevok")
+		ActionOverride("Sarevok",StartDialogNoSet("Sarevok"))
 END
