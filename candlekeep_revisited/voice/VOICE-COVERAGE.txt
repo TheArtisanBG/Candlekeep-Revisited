@@ -1,0 +1,19 @@
+Voice coverage - s9-CandlekeepRevisitedv
+============================================================
+Lines this package is meant to voice : 353
+Lines with audio in the package      : 353  (100.0%)
+Lines without audio                  : 0
+(Not counted: 16 line(s) with no words, such as "...")
+
+Included mods (from weidu.log):
+  ~CANDLEKEEP_REVISITED\CANDLEKEEP_REVISITED.TP2~ #0 #0 // Candlekeep Revisited: BG1 Prologue Expansion
+  ~CANDLEKEEP_REVISITED\CANDLEKEEP_REVISITED.TP2~ #0 #1 // Candlekeep Revisited: BG1 Expanded Starting Sequence
+  ~CANDLEKEEP_REVISITED\CANDLEKEEP_REVISITED.TP2~ #0 #5 // Candlekeep Revisited: Extended dialogue with Gorion and Ulraunt
+
+Per mod:
+  candlekeep_revisited: 353 / 353  (100.0%)
+
+
+Mod strings that are not in dialog.tlk (cannot be voiced by attaching sound),
+one file per mod in the Reports folder:
+  Reports/candlekeep_revisited-not-in-dialog-tlk.txt

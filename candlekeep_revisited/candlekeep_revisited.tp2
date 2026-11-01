@@ -87,3 +87,11 @@ BEGIN ~Candlekeep Revisited: Extended dialogue with Gorion and Ulraunt~ DESIGNAT
   REQUIRE_PREDICATE !(MOD_IS_INSTALLED ~candlekeep_revisited.tp2~ ~1~) ~The Expanded Starting Sequence already includes this scene.~
 
 COMPILE ~%MOD_FOLDER%/dlg/gorion_final.d~ EVAL
+
+// Custom component: AI-voiced versions of the lines this mod adds.
+// Install it after every other Candlekeep Revisited component you want voiced.
+BEGIN ~Candlekeep Revisited: AI voiced lines~ DESIGNATED 6
+  REQUIRE_PREDICATE (GAME_IS ~BGEE EET~) ~This mod must be installed on BG:EE or EET.~
+  REQUIRE_PREDICATE (MOD_IS_INSTALLED ~candlekeep_revisited.tp2~ ~0~) ~The main component must be installed.~
+
+INCLUDE ~%MOD_FOLDER%/lib/voice.tpa~
