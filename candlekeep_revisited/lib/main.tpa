@@ -229,6 +229,7 @@ COPY_EXISTING ~SONGLIST.2da~ ~override~
 COMPILE ~%MOD_FOLDER%/bcs/c0cr#c6s.baf~
 COMPILE ~%MOD_FOLDER%/bcs/c0cr#014.baf~
 COMPILE ~%MOD_FOLDER%/bcs/c0cr#015.baf~
+COMPILE ~%MOD_FOLDER%/bcs/c0cr#sku.baf~  // custom: Esc-skip for the Ulraunt scene
 COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/bcs/c0cr#c01.baf~
 COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/bcs/c0cr#c02.baf~
 COMPILE EVALUATE_BUFFER ~%MOD_FOLDER%/bcs/c0cr#c03.baf~

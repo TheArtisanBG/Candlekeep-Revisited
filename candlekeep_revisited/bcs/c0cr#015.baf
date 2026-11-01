@@ -3,6 +3,9 @@ IF
 THEN
     RESPONSE #100
         CutSceneId("Ulraunt")
+        SetAreaScript("C0CR#SKU",OVERRIDE)
+        SetGlobal("C0CR_ULR_SKIP","GLOBAL",1)
+        SetCutSceneBreakable(TRUE)
         MoveViewObject(Player1,INSTANT)
 		Wait(2)
 		MoveToPoint([2608.1682])
@@ -15,6 +18,9 @@ THEN
 		CloseDoor("Door2608")
 		Lock("Door2608")
 		Wait(2)
+		SetCutSceneBreakable(FALSE)
+		SetGlobal("C0CR_ULR_SKIP","GLOBAL",0)
+		SetAreaScript("",OVERRIDE)
 		ActionOverride("Gorion",StartDialogueNoSet(Player1))
 		DestroySelf()
 END
