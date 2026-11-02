@@ -20,7 +20,7 @@ CHAIN %bg1_imoen_dlg% C0CandleReImoenFarewell.2
 DO ~SetGlobal("C0CandleReImoenJoins","GLOBAL",3)
 ClearAllActions()
 StartCutSceneMode()
-StartCutScene("ch1cut01")~ EXIT
+ActionOverride("Gorion",StartCutSceneEx("ch1cut01",FALSE))~ EXIT
 
 INTERJECT IMOEN 7 C0CandleReImoenJoins
 == IMOEN ~So, you headin' out with Mr. G right away? Said your farewells an' all?~
