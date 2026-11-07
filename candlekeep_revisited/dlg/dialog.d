@@ -368,7 +368,7 @@ IsGabber(Player1)~ THEN C0CR#MOR C0CandleReMordaine
 ~Hello again, <CHARNAME>. You'd better get going. Gorion won't be happy with you if you're any more late.~
 END
   + ~Global("C0CandleReMordaineQuest","GLOBAL",0)~ + ~Is there anything I can do for you before I go?~ DO ~SetGlobal("C0CandleReMordaineQuest","GLOBAL",1)~ + C0CandleReMordaine.2
-  + ~Global("C0CandleReMordaineQuest","GLOBAL",2)~ + ~I delivered your letter.~ DO ~SetGlobal("C0CandleReMordaineQuest","GLOBAL",3)~ + C0CandleReMordaineQuestComplete
+  + ~Global("C0CandleReMordaineQuest","GLOBAL",2)~ + ~I delivered your letter.~ DO ~SetGlobal("C0CandleReMordaineQuest","GLOBAL",3) AddJournalEntry(%Quest1_Entry_2%,QUEST_DONE) AddexperienceParty(100) GiveItemCreate("potn36",Player1,1,0,0)~ + C0CandleReMordaineQuestComplete
   ++ ~You're right. See you, Mordaine.~ EXIT
 
 CHAIN C0CR#MOR C0CandleReMordaineQuestComplete
@@ -388,7 +388,7 @@ CHAIN C0CR#MOR C0CandleReMordaineQuestComplete.2
 ~I asked that reader to bring me some of the potions I asked for during the last delivery to the castle. Things to bolster memory, keep fatigue at bay, you get the idea. He gave me the wrong ones, and it's all sorts of nonsense that I've no use for.~
 = ~I told him, he'd better find where my order went and get it to me, or else I'll make sure he'll still be washing dishes in his current position for the next decade. I paid a good bit of gold for those potions!~
 = ~You know what, <CHARNAME>? Here, take this with you. I couldn't find the intended owner for this bottle, and I can't use it myself. It's a very strange concoction... but I don't think it's dangerous. Maybe it'll do you some good out there.~
-DO ~AddJournalEntry(%Quest1_Entry_2%,QUEST_DONE) AddexperienceParty(100) GiveItemCreate("potn36",Player1,1,0,0)~ EXIT
+EXIT
 
 CHAIN IF WEIGHT #-1 ~Global("Chapter","GLOBAL",0)
 IsGabber("%bg1_imoen%")~ THEN C0CR#MOR C0CandleReMordaineImoen
