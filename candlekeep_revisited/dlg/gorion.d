@@ -4,7 +4,7 @@ BEGIN C0CR#ERI
 BEGIN C0CR#DOG
 
 CHAIN IF WEIGHT #-1 ~Global("C0CandleReGorionBegin","GLOBAL",0)~ THEN C0CR#GOR C0CandleReGorion
-~There you are, my child.~ [GORIN01]
+~There you are, my child.~
 DO ~SetGlobal("C0CandleReGorionBegin","GLOBAL",1)~
 END
 IF ~Global("C0CandleReClassStartBard","GLOBAL",1)~ EXTERN C0CR#GOR C0CandleReGorionBard
