@@ -103,11 +103,18 @@ I_C_T2 REEVOR 0 C0CandleReImoenInterjectReevor
 == %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ THEN ~Beware, rat nation. <CHARNAME> be here with <PRO_HISHER> mighty broom to claim all that is yours. Isn't this what we have cats for?~
 END
 
-I_C_T2 OBE 0 C0CandleReImoenObe
-== %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ THEN ~Looks like a fun party. I don't wanna get in your way with everybody else here, so I'll just wait outside until you're finished.~
-DO ~SetGlobal("C0CandleReImoenObeLeave","GLOBAL",1)
-EscapeAreaMove("%bg1_eet_symbol%2600",3233,2853,SW)~
+// Imoen's own line sets the flag, so a conversation cut short before she speaks can be retried.
+// (ar2600.baf resets both globals when she rejoins, so she still speaks up on every visit.)
+EXTEND_BOTTOM OBE 0
+IF ~Global("C0CandleReImoenObe","GLOBAL",0) IsValidForPartyDialog("%bg1_imoen%")~ EXTERN %bg1_imoen_dlg% C0CandleReImoenObe
 END
+
+CHAIN %bg1_imoen_dlg% C0CandleReImoenObe
+~Looks like a fun party. I don't wanna get in your way with everybody else here, so I'll just wait outside until you're finished.~
+DO ~SetGlobal("C0CandleReImoenObe","GLOBAL",1)
+SetGlobal("C0CandleReImoenObeLeave","GLOBAL",1)
+EscapeAreaMove("%bg1_eet_symbol%2600",3233,2853,SW)~
+EXTERN OBE 1
 
 // Assassin
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
