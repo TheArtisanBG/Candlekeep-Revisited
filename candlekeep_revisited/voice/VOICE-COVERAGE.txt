@@ -1,24 +1,9 @@
-Voice coverage - s9-CandlekeepRevisitedv
+Voice coverage - Candlekeep Revisited component 6 (AI voiced lines)
 ============================================================
-Lines this package is meant to voice : 353
-Lines with audio in the package      : 352  (99.7%)
-Lines without audio                  : 1
-(Not counted: 16 line(s) with no words, such as "...")
+Distinct lines voiced : 356  (360 entries; a few lines appear at more than one string)
+Audio files           : 355
 
-Included mods (from weidu.log):
-  ~CANDLEKEEP_REVISITED\CANDLEKEEP_REVISITED.TP2~ #0 #0 // Candlekeep Revisited: BG1 Prologue Expansion
-  ~CANDLEKEEP_REVISITED\CANDLEKEEP_REVISITED.TP2~ #0 #1 // Candlekeep Revisited: BG1 Expanded Starting Sequence
-  ~CANDLEKEEP_REVISITED\CANDLEKEEP_REVISITED.TP2~ #0 #5 // Candlekeep Revisited: Extended dialogue with Gorion and Ulraunt
+Lines are matched by their exact text in dialog.tlk (UTF-8), so only lines from the
+components you have installed get voiced. Lines that already have a sound are left alone.
 
-Per mod:
-  candlekeep_revisited: 352 / 353  (99.7%)
-
-Lines without audio (NPC, strref, text):
-------------------------------------------------------------
-
-[Paloma]
-  310254: Zzz...
-
-Mod strings that are not in dialog.tlk (cannot be voiced by attaching sound),
-one file per mod in the Reports folder:
-  Reports/candlekeep_revisited-not-in-dialog-tlk.txt
+Built from the s9-Everything voice pack (v1.05), filtered to this mod's own lines.
