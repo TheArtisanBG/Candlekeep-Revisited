@@ -57,7 +57,8 @@ CHAIN IMOEN C0CandleReImoenJoins.2
 DO ~SetGlobal("C0CandleReImoenJoins","GLOBAL",2)
 SetGlobal("X#ImFriendTalk","GLOBAL",-1)
 SetGlobal("C0CandleReImoenJoined","LOCALS",1)
-JoinParty()~ EXIT
+JoinParty()
+SetDialog("%bg1_imoen_dlg%")~ EXIT
 
 CHAIN IMOEN C0CandleReImoenJoins.3
 ~Alright, fine. If ya say so. Just make sure you talk to everybody, okay? Spent all your life here, people won't like it if you head off without a word. Go on then, you.~
@@ -71,7 +72,7 @@ CHAIN IF WEIGHT #-1 ~GlobalLT("TalkedToGorion","GLOBAL",1)
 Global("C0CandleReImoenJoins","GLOBAL",2)~ THEN IMOENP C0CandleReImoenKicked
 ~Hey, what's up? You done hanging around, and it's time for you to go?~
 END
-++ ~No, not yet. You can stay for a bit longer.~ DO ~JoinParty()~ EXIT
+++ ~No, not yet. You can stay for a bit longer.~ DO ~JoinParty() SetDialog("%bg1_imoen_dlg%")~ EXIT
 ++ ~Yeah. See you around, Imoen.~ + C0CandleReImoenKicked.1
 
 CHAIN IMOENP C0CandleReImoenKicked.1
