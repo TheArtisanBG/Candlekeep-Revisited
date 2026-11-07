@@ -1,7 +1,7 @@
 Voice coverage - Candlekeep Revisited component 6 (AI voiced lines)
 ============================================================
-Distinct lines voiced : 356  (360 entries; a few lines appear at more than one string)
-Audio files           : 355
+Distinct lines voiced : 357  (361 entries; a few lines appear at more than one string)
+Audio files           : 356
 
 Lines are matched by their exact text in dialog.tlk (UTF-8), so only lines from the
 components you have installed get voiced. Lines that already have a sound are left alone.
