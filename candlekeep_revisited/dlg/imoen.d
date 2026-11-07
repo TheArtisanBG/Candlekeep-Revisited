@@ -40,6 +40,20 @@ END
  ++ ~Not yet. I was just about to.~ + C0CandleReImoenJoins.1
  ++ ~Yep. I'll be off soon.~ + C0CandleReImoenJoins.0
 
+// Custom: until Imoen has joined, talking to her again in the prologue repeats her offer
+// instead of the dead-end "Don't keep Mr. G waiting now." (Same line and voice as the first time.)
+CHAIN IF WEIGHT #-1 ~Global("Chapter","GLOBAL",0)
+!NumTimesTalkedTo(0)
+!InParty(Myself)
+OR(2)
+Global("C0CandleReImoenJoins","GLOBAL",0)
+Global("C0CandleReImoenJoins","GLOBAL",1)~ THEN IMOEN C0CandleReImoenAskAgain
+~So, you headin' out with Mr. G right away? Said your farewells an' all?~
+DO ~SetGlobal("C0CandleReImoenJoins","GLOBAL",1)~
+END
+ ++ ~Not yet. I was just about to.~ + C0CandleReImoenJoins.1
+ ++ ~Yep. I'll be off soon.~ + C0CandleReImoenJoins.0
+
 CHAIN IMOEN C0CandleReImoenJoins.0
 ~Alright, then... guess this is goodbye. Keep in touch if you can, alright? Tell me what it's like out there. Maybe one day I'll be seein' it for myself!~
 EXIT
