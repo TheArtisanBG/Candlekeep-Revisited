@@ -15,7 +15,7 @@ IsGabber(Player1)~ THEN C0CR#ARK C0CandleReArkanis
 ~<CHARNAME>! It's good to see you, my <PRO_GIRLBOY>. The two of us were worried you'd left with Gorion before we had a chance to see you off.~
 = ~It's going to be sad to watch you go, after seeing you grow up in these walls, but we know you'll be fine. And don't worry, the keep'll still be standing once you come back. All of us—Hull, Deder, and the lot—we'll make sure of it.~
 END
-  + ~Global("C0CandleReArkanisQuest","GLOBAL",0)~ + ~I'm helping out around the place one more time before I go. Do you need anything?~ DO ~SetGlobal("C0CandleReArkanisQuest","GLOBAL",1)~ + C0CandleReArkanis.1
+  + ~Global("C0CandleReArkanisQuest","GLOBAL",0)~ + ~I'm helping out around the place one more time before I go. Do you need anything?~ DO ~SetGlobal("C0CandleReArkanisQuest","GLOBAL",1) AddJournalEntry(%Quest3_Entry_1%,QUEST)~ + C0CandleReArkanis.1
   ++ ~Thank you. See you, Arkanis, Deder.~ EXIT
 
 CHAIN C0CR#ARK C0CandleReArkanis.1
@@ -24,14 +24,14 @@ CHAIN C0CR#ARK C0CandleReArkanis.1
 == %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ ~You like to read, Arkanis? How come I've never heard you say anything about that before?~
 == C0CR#ARK IF ~IsValidForPartyDialog("%bg1_imoen%")~ ~Well... I'm nowhere near as good at it as you, Imoen. But I've been in Candlekeep for a while, so I can't help but take an interest in books after all the years. Makes it worth leaving my clanhold for, having learned so many new things.~
 == C0CR#DED ~Whatever you can get us is fine. Make sure they've got lots of pages, though. We'll need them for a while.~
-DO ~AddJournalEntry(%Quest3_Entry_1%,QUEST)~ EXIT
+EXIT
 
 CHAIN IF WEIGHT #-1 ~Global("Chapter","GLOBAL",0)
 !NumTimesTalkedTo(0)
 IsGabber(Player1)~ THEN C0CR#ARK C0CandleReArkanis.2
 ~Hello again, <CHARNAME>.~
 END
-  + ~Global("C0CandleReArkanisQuest","GLOBAL",0)~ + ~I'm helping out around the place one more time before I go. Do you need anything?~ + C0CandleReArkanis.1
+  + ~Global("C0CandleReArkanisQuest","GLOBAL",0)~ + ~I'm helping out around the place one more time before I go. Do you need anything?~ DO ~SetGlobal("C0CandleReArkanisQuest","GLOBAL",1) AddJournalEntry(%Quest3_Entry_1%,QUEST)~ + C0CandleReArkanis.1
   + ~Global("C0CandleReArkanisQuest","GLOBAL",1)
 	 PartyHasItem("BOOK18")
      PartyHasItem("BOOK35")~ + ~I've got the books you asked for.~ + C0CandleReArkanis.3
@@ -90,14 +90,19 @@ CHAIN IF WEIGHT #-1 ~GlobalGT("Chapter","GLOBAL",0)~ THEN C0CR#ARK C0CandleReArk
 ~Keep your wits about you, my <PRO_GIRLBOY>, and don't hesitate to come running to me something concerns you. You may have grown much from traveling out there, but you'll always be a ward of Candlekeep.~
 EXIT
 
-INTERJECT ARKANI3 3 C0CandleReArkanisImoenTalk
-== %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ THEN ~Wait! Arkanis, <CHARNAME>, please don't! <CHARNAME>, I think we can trust them. We need all the help we can get to make it through here... so let's work together, okay?~
+EXTEND_BOTTOM ARKANI3 3
+IF ~Global("C0CandleReArkanisImoenTalk","GLOBAL",0) IsValidForPartyDialog("%bg1_imoen%")~ EXTERN %bg1_imoen_dlg% C0CandleReArkanisImoenTalk
+END
+
+CHAIN %bg1_imoen_dlg% C0CandleReArkanisImoenTalk
+~Wait! Arkanis, <CHARNAME>, please don't! <CHARNAME>, I think we can trust them. We need all the help we can get to make it through here... so let's work together, okay?~
+DO ~SetGlobal("C0CandleReArkanisImoenTalk","GLOBAL",1)~
 END
  ++ ~Fine. If you think they can be trusted, Imoen... they can come with us.~ EXTERN %bg1_imoen_dlg% C0CandleReArkanisImoenTalk.1
  ++ ~I won't hurt them, but I can't trust them. Get out of my sight, the both of you!~ EXTERN ARKANI3 2
  ++ ~No, I won't risk any chance of a trap. They die!~ DO ~ActionOverride("DEDER",Enemy())
 ActionOverride("ARKANIS",Enemy())~ EXIT
- 
+
 CHAIN %bg1_imoen_dlg% C0CandleReArkanisImoenTalk.1
 ~Thank you, <CHARNAME>. Arkanis, Deder... please help us get through here. We can trust you, right?~
 EXTERN ARKANI3 1
@@ -157,7 +162,7 @@ NumTimesTalkedTo(0)
 IsGabber(Player1)~ THEN C0CR#CAN C0CandleReCanderous
 ~Good <DAYNIGHTALL>, <CHARNAME>. I'm glad we got a chance to see each other before you leave. May Helm watch over you and Gorion on your journey.~
 END
-  + ~Global("C0CandleReCanderousQuest","GLOBAL",0)~ + ~You look as busy as ever, Canderous. Is there anything I can do to help you?~ + C0CandleReCanderous.1
+  + ~Global("C0CandleReCanderousQuest","GLOBAL",0)~ + ~You look as busy as ever, Canderous. Is there anything I can do to help you?~ DO ~AddJournalEntry(%Quest2_Entry_1%,QUEST) SetGlobal("C0CandleReCanderousQuest","GLOBAL",1)~ + C0CandleReCanderous.1
   ++ ~Thank you. I'll be going now.~ EXIT
 
 CHAIN C0CR#CAN C0CandleReCanderous.1
@@ -165,7 +170,7 @@ CHAIN C0CR#CAN C0CandleReCanderous.1
 == C0CR#CAN	~As you can see, the clinic is especially full of patients today. We've almost used up all of our bandages and medicines here. I was informed that we were to receive a new supply of stock this morning, but it has yet to arrive. I have asked the priests of Oghma, and they have told me that the worker in charge of delivery has been late to perform their duties.~
 == %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ ~What? Don't look at me! I wouldn't steal stuff used for healing people, they're too important. That wouldn't be even slightly funny.~
 == C0CR#CAN ~If you could go to the priests' quarters and inquire as to their status, I would be most grateful.~
-DO ~AddJournalEntry(%Quest2_Entry_1%,QUEST) SetGlobal("C0CandleReCanderousQuest","GLOBAL",1)~ EXIT
+EXIT
 
 CHAIN IF WEIGHT #-1 ~Global("Chapter","GLOBAL",0)
 !NumTimesTalkedTo(0)
@@ -174,7 +179,7 @@ IsGabber(Player1)~ THEN C0CR#CAN C0CandleReCanderousAgain
 END
   + ~Global("C0CandleReCanderousQuest","GLOBAL",1)
      PartyHasItem("C0CR#BAG")~ + ~I've found your medical supplies.~ DO ~TakePartyItem("C0CR#BAG") DestroyItem("C0CR#BAG")~ + C0CandleReCanderous.2
-  + ~Global("C0CandleReCanderousQuest","GLOBAL",0)~ + ~You look as busy as ever, Canderous. Is there anything I can do to help you?~ + C0CandleReCanderous.1
+  + ~Global("C0CandleReCanderousQuest","GLOBAL",0)~ + ~You look as busy as ever, Canderous. Is there anything I can do to help you?~ DO ~AddJournalEntry(%Quest2_Entry_1%,QUEST) SetGlobal("C0CandleReCanderousQuest","GLOBAL",1)~ + C0CandleReCanderous.1
   ++ ~Then I should leave you to your work.~ EXIT
 
 CHAIN C0CR#CAN C0CandleReCanderous.2
@@ -368,7 +373,7 @@ IsGabber(Player1)~ THEN C0CR#MOR C0CandleReMordaine
 ~Hello again, <CHARNAME>. You'd better get going. Gorion won't be happy with you if you're any more late.~
 END
   + ~Global("C0CandleReMordaineQuest","GLOBAL",0)~ + ~Is there anything I can do for you before I go?~ DO ~SetGlobal("C0CandleReMordaineQuest","GLOBAL",1)~ + C0CandleReMordaine.2
-  + ~Global("C0CandleReMordaineQuest","GLOBAL",2)~ + ~I delivered your letter.~ DO ~SetGlobal("C0CandleReMordaineQuest","GLOBAL",3)~ + C0CandleReMordaineQuestComplete
+  + ~Global("C0CandleReMordaineQuest","GLOBAL",2)~ + ~I delivered your letter.~ DO ~SetGlobal("C0CandleReMordaineQuest","GLOBAL",3) AddJournalEntry(%Quest1_Entry_2%,QUEST_DONE) AddexperienceParty(100)~ + C0CandleReMordaineQuestComplete
   ++ ~You're right. See you, Mordaine.~ EXIT
 
 CHAIN C0CR#MOR C0CandleReMordaineQuestComplete
@@ -388,7 +393,7 @@ CHAIN C0CR#MOR C0CandleReMordaineQuestComplete.2
 ~I asked that reader to bring me some of the potions I asked for during the last delivery to the castle. Things to bolster memory, keep fatigue at bay, you get the idea. He gave me the wrong ones, and it's all sorts of nonsense that I've no use for.~
 = ~I told him, he'd better find where my order went and get it to me, or else I'll make sure he'll still be washing dishes in his current position for the next decade. I paid a good bit of gold for those potions!~
 = ~You know what, <CHARNAME>? Here, take this with you. I couldn't find the intended owner for this bottle, and I can't use it myself. It's a very strange concoction... but I don't think it's dangerous. Maybe it'll do you some good out there.~
-DO ~AddJournalEntry(%Quest1_Entry_2%,QUEST_DONE) AddexperienceParty(100) GiveItemCreate("potn36",Player1,1,0,0)~ EXIT
+DO ~GiveItemCreate("potn36",Player1,1,0,0)~ EXIT
 
 CHAIN IF WEIGHT #-1 ~Global("Chapter","GLOBAL",0)
 IsGabber("%bg1_imoen%")~ THEN C0CR#MOR C0CandleReMordaineImoen

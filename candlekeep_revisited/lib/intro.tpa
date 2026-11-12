@@ -68,6 +68,10 @@ COMPILE ~%MOD_FOLDER%/bcs/c0cr#016.baf~
 COMPILE ~%MOD_FOLDER%/bcs/c0cr#skp.baf~
 
 COMPILE ~%MOD_FOLDER%/dlg/gorion.d~ EVAL
+// custom: farewell/Ulraunt scene lives in its own file now (also offered as component 5)
+ACTION_IF !(MOD_IS_INSTALLED ~candlekeep_revisited.tp2~ ~5~) BEGIN
+  COMPILE ~%MOD_FOLDER%/dlg/gorion_final.d~ EVAL
+END
 
 COPY ~%MOD_FOLDER%/SPL/C0CR#VI4.SPL~ ~OVERRIDE~
 SAY NAME1 ~Find Familiar~

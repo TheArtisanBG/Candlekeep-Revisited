@@ -1,0 +1,24 @@
+// Custom addition: lets Esc skip the Ulraunt scene at the gate.
+// Ends in the same state as watching it: Ulraunt gone, door locked,
+// then Gorion's follow-up conversation starts.
+IF
+    CutSceneBroken()
+    Global("C0CR_ULR_SKIP","GLOBAL",1)
+THEN
+    RESPONSE #100
+        SetCutSceneBreakable(FALSE)
+        SetGlobal("C0CR_ULR_SKIP","GLOBAL",0)
+        StartCutSceneMode()
+        ClearAllActions()
+        FadeToColor([0.0],0)
+        ActionOverride(Player1,ClearActions(Myself))
+        ActionOverride("Ulraunt",DestroySelf())
+        SetGlobal("C0CandleReGorionFinal","GLOBAL",2)
+        SetCursorState(FALSE)
+        SetAreaScript("",OVERRIDE)
+        FadeFromColor([20.0],0)
+        EndCutSceneMode()
+        ActionOverride("Gorion",StartDialogueNoSet(Player1))
+        CloseDoor("Door2608")
+        Lock("Door2608")
+END

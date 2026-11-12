@@ -20,7 +20,7 @@ CHAIN %bg1_imoen_dlg% C0CandleReImoenFarewell.2
 DO ~SetGlobal("C0CandleReImoenJoins","GLOBAL",3)
 ClearAllActions()
 StartCutSceneMode()
-StartCutScene("ch1cut01")~ EXIT
+ActionOverride("Gorion",StartCutSceneEx("ch1cut01",FALSE))~ EXIT
 
 INTERJECT IMOEN 7 C0CandleReImoenJoins
 == IMOEN ~So, you headin' out with Mr. G right away? Said your farewells an' all?~
@@ -36,6 +36,20 @@ END
  
 INTERJECT IMOEN 7 C0CandleReImoenJoins
 == IMOEN ~So, you headin' out with Mr. G right away? Said your farewells an' all?~
+END
+ ++ ~Not yet. I was just about to.~ + C0CandleReImoenJoins.1
+ ++ ~Yep. I'll be off soon.~ + C0CandleReImoenJoins.0
+
+// Custom: until Imoen has joined, talking to her again in the prologue repeats her offer
+// instead of the dead-end "Don't keep Mr. G waiting now." (Same line and voice as the first time.)
+CHAIN IF WEIGHT #-1 ~Global("Chapter","GLOBAL",0)
+!NumTimesTalkedTo(0)
+!InParty(Myself)
+OR(2)
+Global("C0CandleReImoenJoins","GLOBAL",0)
+Global("C0CandleReImoenJoins","GLOBAL",1)~ THEN IMOEN C0CandleReImoenAskAgain
+~So, you headin' out with Mr. G right away? Said your farewells an' all?~
+DO ~SetGlobal("C0CandleReImoenJoins","GLOBAL",1)~
 END
  ++ ~Not yet. I was just about to.~ + C0CandleReImoenJoins.1
  ++ ~Yep. I'll be off soon.~ + C0CandleReImoenJoins.0
@@ -57,7 +71,8 @@ CHAIN IMOEN C0CandleReImoenJoins.2
 DO ~SetGlobal("C0CandleReImoenJoins","GLOBAL",2)
 SetGlobal("X#ImFriendTalk","GLOBAL",-1)
 SetGlobal("C0CandleReImoenJoined","LOCALS",1)
-JoinParty()~ EXIT
+JoinParty()
+SetDialog("%bg1_imoen_dlg%")~ EXIT
 
 CHAIN IMOEN C0CandleReImoenJoins.3
 ~Alright, fine. If ya say so. Just make sure you talk to everybody, okay? Spent all your life here, people won't like it if you head off without a word. Go on then, you.~
@@ -71,7 +86,7 @@ CHAIN IF WEIGHT #-1 ~GlobalLT("TalkedToGorion","GLOBAL",1)
 Global("C0CandleReImoenJoins","GLOBAL",2)~ THEN IMOENP C0CandleReImoenKicked
 ~Hey, what's up? You done hanging around, and it's time for you to go?~
 END
-++ ~No, not yet. You can stay for a bit longer.~ DO ~JoinParty()~ EXIT
+++ ~No, not yet. You can stay for a bit longer.~ DO ~JoinParty() SetDialog("%bg1_imoen_dlg%")~ EXIT
 ++ ~Yeah. See you around, Imoen.~ + C0CandleReImoenKicked.1
 
 CHAIN IMOENP C0CandleReImoenKicked.1
@@ -103,11 +118,18 @@ I_C_T2 REEVOR 0 C0CandleReImoenInterjectReevor
 == %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ THEN ~Beware, rat nation. <CHARNAME> be here with <PRO_HISHER> mighty broom to claim all that is yours. Isn't this what we have cats for?~
 END
 
-I_C_T2 OBE 0 C0CandleReImoenObe
-== %bg1_imoen_dlg% IF ~IsValidForPartyDialog("%bg1_imoen%")~ THEN ~Looks like a fun party. I don't wanna get in your way with everybody else here, so I'll just wait outside until you're finished.~
-DO ~SetGlobal("C0CandleReImoenObeLeave","GLOBAL",1)
-EscapeAreaMove("%bg1_eet_symbol%2600",3233,2853,SW)~
+// Imoen's own line sets the flag, so a conversation cut short before she speaks can be retried.
+// (ar2600.baf resets both globals when she rejoins, so she still speaks up on every visit.)
+EXTEND_BOTTOM OBE 0
+IF ~Global("C0CandleReImoenObe","GLOBAL",0) IsValidForPartyDialog("%bg1_imoen%")~ EXTERN %bg1_imoen_dlg% C0CandleReImoenObe
 END
+
+CHAIN %bg1_imoen_dlg% C0CandleReImoenObe
+~Looks like a fun party. I don't wanna get in your way with everybody else here, so I'll just wait outside until you're finished.~
+DO ~SetGlobal("C0CandleReImoenObe","GLOBAL",1)
+SetGlobal("C0CandleReImoenObeLeave","GLOBAL",1)
+EscapeAreaMove("%bg1_eet_symbol%2600",3233,2853,SW)~
+EXTERN OBE 1
 
 // Assassin
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -23,20 +23,18 @@ THEN
 	SetGlobal("C0CandleReImoenAssassin","GLOBAL",-1)
 END
 	
+// Custom fix: once Chapter 1 starts, the temporary Candlekeep Imoen (the only Imoen with
+// C0CandleReImoenJoined set, because she joined in Candlekeep) removes herself, leaving the
+// real Imoen untouched to walk over, say "Sorry I followed ya..." and join as in the base game.
+// The old handoff here ran on the real Imoen instead and ended with her DestroySelf(); on EET both
+// Imoens share the death variable IMOEN2, so its MoveGlobalObject could not tell them apart.
 IF
-	Global("C0CandleReImoenJoined","LOCALS",0)
-	Global("Chapter","GLOBAL",1)
-	AreaCheck("%bg1_eet_symbol%2700")
-	Global("C0CandleReImoenJoins","GLOBAL",3)
+	Global("C0CandleReImoenJoined","LOCALS",1)
+	GlobalGT("Chapter","GLOBAL",0)
+	!InParty(Myself)
 THEN
   RESPONSE #100
-	SetGlobal("C0CandleReImoenJoins","GLOBAL",4)
-	MoveGlobalObject("%bg1_imoen%",Myself)
-	ActionOverride("%bg1_imoen%",SetDialog("%bg1_imoen_dlg%"))
-	ActionOverride("%bg1_imoen%",SetNumTimesTalkedTo(0))
-	ActionOverride("%bg1_imoen%",XEquipItem("BOW05",Myself,SLOT_WEAPON0,EQUIP))
-	ActionOverride("%bg1_imoen%",XEquipItem("AROW01",Myself,SLOT_AMMO0,EQUIP))
-	ActionOverride("%bg1_imoen%",SetItemFlags("WAND12",IDENTIFIED,TRUE))
+	SetGlobal("C0CandleReImoenAssassin","GLOBAL",2)  // Candlekeep-only talk; don't let it pre-empt the real Imoen's greeting
 	DestroySelf()
 END
 	

@@ -1,0 +1,164 @@
+// AI voiced lines (custom component 6).
+// Adapted from the packaged mod s9-CandlekeepRevisitedv (VVE_Builder IE Voiceover Patcher v1.03).
+// Lines are matched by their exact text in dialog.tlk, so this works whichever
+// Candlekeep Revisited components are installed; lines from components that are
+// not installed are simply skipped. Lines that already have a sound are left alone.
+
+DEFINE_ACTION_MACRO vo_attach BEGIN
+  LOAD_TRA ~%tra_file%~
+
+  ACTION_CLEAR_ARRAY want_count
+  ACTION_CLEAR_ARRAY want_res
+  ACTION_CLEAR_ARRAY cand_count
+  ACTION_CLEAR_ARRAY cand_ref
+
+  OUTER_SET exact = 0
+  OUTER_SET moved = 0
+  OUTER_SET unresolved = 0
+  OUTER_SET skipped = 0
+  OUTER_SET tlk_total = NEXT_STRREF
+
+  // Pass 1: trust the remembered strref, but only if the text still matches.
+  COPY - ~%map_file%~ ~override~
+    READ_2DA_ENTRIES_NOW vo_map 3
+
+    FOR (row = 0; row < vo_map; row = row + 1) BEGIN
+      READ_2DA_ENTRY_FORMER vo_map row 0 strref
+      READ_2DA_ENTRY_FORMER vo_map row 1 resref
+      READ_2DA_ENTRY_FORMER vo_map row 2 tid
+
+      INNER_ACTION BEGIN
+        // Copy the file here, one at a time (like the vve mods do). A file WeiDU cannot
+        // load (antivirus lock, etc.) is retried once and then only logged, so a single
+        // bad file never stops the others.
+        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
+          ACTION_TRY
+            COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
+          WITH DEFAULT
+            LOG ~[VO Patcher] could not copy %resref%.wav~
+          END
+        END
+        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
+          ACTION_TRY
+            COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
+          WITH DEFAULT
+            LOG ~[VO Patcher] could not copy (2nd try) %resref%.wav~
+          END
+        END
+        OUTER_SPRINT exp (AT ~%tid%~)
+        OUTER_SET have_hint = 0
+        ACTION_IF (strref > 0 AND strref < tlk_total) BEGIN
+          ACTION_GET_STRREF strref cur
+          ACTION_IF (~%cur%~ STRING_EQUAL ~%exp%~) BEGIN OUTER_SET have_hint = 1 END
+        END
+        ACTION_IF have_hint = 1 BEGIN
+          STRING_SET_EVALUATE strref ~%cur%~ [%resref%]
+          OUTER_SET exact = exact + 1
+        END ELSE BEGIN
+          ACTION_IF VARIABLE_IS_SET $want_count(~%exp%~) BEGIN
+            OUTER_SET $want_count(~%exp%~) = $want_count(~%exp%~) + 1
+          END ELSE BEGIN
+            OUTER_SET $want_count(~%exp%~) = 1
+            OUTER_TEXT_SPRINT $want_res(~%exp%~) ~%resref%~
+          END
+          OUTER_SET unresolved = unresolved + 1
+        END
+      END
+    END
+  BUT_ONLY
+
+  // Pass 2 (only if needed): find the moved/changed lines by their text.
+  ACTION_IF unresolved > 0 BEGIN
+    OUTER_SET total = NEXT_STRREF
+    OUTER_FOR (i = 0; i < total; i = i + 1) BEGIN
+      ACTION_GET_STRREF i cur
+      ACTION_IF VARIABLE_IS_SET $want_count(~%cur%~) BEGIN
+        ACTION_GET_STRREF_S i snd
+        ACTION_IF (~%snd%~ STRING_EQUAL ~~) BEGIN
+          ACTION_IF VARIABLE_IS_SET $cand_count(~%cur%~) BEGIN
+            OUTER_SET $cand_count(~%cur%~) = $cand_count(~%cur%~) + 1
+          END ELSE BEGIN
+            OUTER_SET $cand_count(~%cur%~) = 1
+            OUTER_SET $cand_ref(~%cur%~) = i
+          END
+        END
+      END
+    END
+
+    ACTION_PHP_EACH want_res AS txt => res BEGIN
+      ACTION_IF (VARIABLE_IS_SET $cand_count(~%txt%~) AND $cand_count(~%txt%~) = 1 AND $want_count(~%txt%~) = 1) BEGIN
+        OUTER_SET ref = $cand_ref(~%txt%~)
+        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%res%.wav~ BEGIN
+          ACTION_TRY
+            COPY ~%MOD_FOLDER%/voice/wav/%res%.wav~ ~override~
+          WITH DEFAULT
+            LOG ~[VO Patcher] could not copy %res%.wav~
+          END
+        END
+        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%res%.wav~ BEGIN
+          ACTION_TRY
+            COPY ~%MOD_FOLDER%/voice/wav/%res%.wav~ ~override~
+          WITH DEFAULT
+            LOG ~[VO Patcher] could not copy (2nd try) %res%.wav~
+          END
+        END
+        STRING_SET_EVALUATE ref ~%txt%~ [%res%]
+        OUTER_SET moved = moved + 1
+      END ELSE BEGIN
+        LOG ~[VO Patcher] skipped %res%: its text was not found exactly once in dialog.tlk~
+        OUTER_SET skipped = skipped + 1
+      END
+    END
+  END
+
+  OUTER_SET patched = exact + moved
+END
+// vo_repair: runs after everything else, when antivirus has had time to finish scanning the
+// freshly written files. Copies any audio file that is still missing and counts what could not.
+DEFINE_ACTION_MACRO vo_repair BEGIN
+  COPY - ~%map_file%~ ~override~
+    READ_2DA_ENTRIES_NOW vo_rmap 3
+    FOR (row = 0; row < vo_rmap; row = row + 1) BEGIN
+      READ_2DA_ENTRY_FORMER vo_rmap row 1 resref
+      INNER_ACTION BEGIN
+        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
+          ACTION_TRY
+            COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
+          WITH DEFAULT
+            LOG ~[VO Patcher] still missing after repair pass: %resref%.wav~
+          END
+          ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
+            OUTER_SET still_missing = still_missing + 1
+          END
+        END
+      END
+    END
+  BUT_ONLY
+END
+
+
+PRINT ~[VO Patcher] Copying voiceover files and attaching them to their lines (this may take a few minutes)...~
+
+OUTER_TEXT_SPRINT map_file ~%MOD_FOLDER%/voice/data/mapping_core.txt~
+OUTER_TEXT_SPRINT tra_file ~%MOD_FOLDER%/voice/tra/text_core.tra~
+LAUNCH_ACTION_MACRO vo_attach
+OUTER_SET total_patched = patched
+OUTER_SET total_skipped = skipped
+
+OUTER_TEXT_SPRINT map_file ~%MOD_FOLDER%/voice/data/mapping_minor.txt~
+OUTER_TEXT_SPRINT tra_file ~%MOD_FOLDER%/voice/tra/text_minor.tra~
+LAUNCH_ACTION_MACRO vo_attach
+OUTER_SET total_patched = total_patched + patched
+OUTER_SET total_skipped = total_skipped + skipped
+
+// Final pass: fetch any file that could not be copied earlier.
+OUTER_SET still_missing = 0
+OUTER_TEXT_SPRINT map_file ~%MOD_FOLDER%/voice/data/mapping_core.txt~
+LAUNCH_ACTION_MACRO vo_repair
+OUTER_TEXT_SPRINT map_file ~%MOD_FOLDER%/voice/data/mapping_minor.txt~
+LAUNCH_ACTION_MACRO vo_repair
+
+PRINT ~[VO Patcher] Done: %total_patched% line(s) voiced, %total_skipped% skipped (skipped lines are listed in the WeiDU debug log; usually they belong to components that are not installed).~
+ACTION_IF still_missing > 0 BEGIN
+  PRINT ~[VO Patcher] WARNING: %still_missing% audio file(s) could not be copied to override. Reinstall this component, or see the WeiDU debug log.~
+END

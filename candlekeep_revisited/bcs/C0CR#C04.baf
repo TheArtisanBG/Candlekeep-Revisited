@@ -128,11 +128,11 @@ THEN
         ChangeStat(Myself,MAXHITPOINTS,5,SET)
         Wait(1)
         SmallWait(6)
-        FaceObject(Player1)
+        FaceObject("Gorion")  // Gorion (was Player1: the PC has already fled)
         SetSequence(SEQ_ATTACK)
         Wait(4)
         SmallWait(6)
-        Face(S)
+        FaceObject("Gorion")  // Gorion (was Face(S), toward the fleeing PC)
         SetSequence(SEQ_ATTACK)
         Wait(2)
         MoveToPoint([3343.1500])
@@ -195,12 +195,11 @@ THEN
         CutSceneId("bdtarget")  // <NO TEXT>
         SetName(21975)  // Thug
         Wait(1)
-        ForceSpellPoint([3015.1486],TRAP_ARROW)  // SPWI005.SPL (No such index)
-        SmallWait(6)
-        ApplyDamage(Player1,1,PIERCING)
+        // Arrows now land just beside Gorion (at [2915.1455]) and miss; the PC has already fled.
+        ForceSpellPoint([2965.1425],TRAP_ARROW)  // SPWI005.SPL
         Wait(3)
-        SmallWait(6)
-        ForceSpellPoint([2865.2076],TRAP_ARROW_ICE)  // SPWI012.SPL (No such index)
+        SmallWait(12)
+        ForceSpellPoint([2870.1495],TRAP_ARROW_ICE)  // SPWI012.SPL
         DestroySelf()
 END
 

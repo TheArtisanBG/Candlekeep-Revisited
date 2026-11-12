@@ -25,4 +25,5 @@ THEN
 	SetGlobal("C0CandleReImoenObe","GLOBAL",0)
 	SetGlobal("C0CandleReImoenObeLeave","GLOBAL",0)
 	ActionOverride("%bg1_imoen%",JoinParty())
+	ActionOverride("%bg1_imoen%",SetDialog("%bg1_imoen_dlg%"))
 END

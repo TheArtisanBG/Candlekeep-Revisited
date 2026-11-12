@@ -3,6 +3,9 @@ IF
 THEN
     RESPONSE #100
         CutSceneId(Player1)
+        SetAreaScript("C0CR#SKU",OVERRIDE)
+        SetGlobal("C0CR_ULR_SKIP","GLOBAL",1)
+        SetCutSceneBreakable(TRUE)
         MoveViewObject(Myself,INSTANT)
 		Wait(2)
 		CreateCreature("C0CR#ULR",[3179.1628],NW)

@@ -23,7 +23,7 @@ CHAIN CUTGOR C0CandleReSarevScene.2
 DO ~ClearAllActions() StartCutSceneMode() StartCutScene("C0CR#C01")~ EXIT
 
 CHAIN IF WEIGHT #-1 ~Global("C0CandleReSarevokScene","GLOBAL",1)~ THEN CUTSAR C0CandleReSarevScene.1
-~Even in your final moments, you deceive <PRO_HIMHER>. You know full well how this will end.~ [C0BLANK]
+~Even in your final moments, you deceive <PRO_HIMHER>. You know full well how this will end.~
 DO ~SetGlobal("C0CandleReSarevokScene","GLOBAL",2)~ 
 == CUTGOR ~Perhaps. But I do wonder, however... is this your idea of revenge, boy?~
 == CUTSAR ~The past is irrelevant. When I look upon what has become of you and your ward, I consider myself blessed that I was not cursed with such weakness.~
@@ -34,7 +34,7 @@ DO ~SetGlobal("C0CandleReSarevokScene","GLOBAL",2)~
 DO ~ClearAllActions() StartCutSceneMode() StartCutScene("C0CR#C03")~ EXIT
 
 CHAIN IF WEIGHT #-1 ~Global("C0CandleReSarevokScene","GLOBAL",2)~ THEN CUTSAR C0CandleReSarevScene.2
-~Ah... so you do have a speck of your former fire within you after all. This will be more entertaining than I expected.~ [C0BLANK]
+~Ah... so you do have a speck of your former fire within you after all. This will be more entertaining than I expected.~
 DO ~SetGlobal("C0CandleReSarevokScene","GLOBAL",3)~ 
 == TAMOKO ~Sa—~
 == CUTSAR ~Yes, I know. Our time is precious, and our plan is only at its inception. We shall make this quick.~

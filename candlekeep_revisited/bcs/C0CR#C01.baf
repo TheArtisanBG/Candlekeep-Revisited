@@ -3,6 +3,9 @@ IF
 THEN
     RESPONSE #100
         CutSceneId("Gorion")  // Gorion
+        SetAreaScript("cutskip1",OVERRIDE)
+        SetGlobal("BD_CUTSCENE_BREAKABLE","GLOBAL",3)
+        SetCutSceneBreakable(TRUE)
         CreateCreature("cutspy",[3171.1489],S)  // No such index
         MoveViewObject("Gorion",BD_NORMAL)  // Gorion
         PlaySong(%dream_song%)
