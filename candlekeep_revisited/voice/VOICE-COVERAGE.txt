@@ -1,9 +1,10 @@
 Voice coverage - Candlekeep Revisited component 6 (AI voiced lines)
 ============================================================
-Distinct lines voiced : 357  (361 entries; a few lines appear at more than one string)
+Distinct lines voiced : 356  (360 entries; a few lines appear at more than one string)
 Audio files           : 356
 
-Lines are matched by their exact text in dialog.tlk (UTF-8), so only lines from the
-components you have installed get voiced. Lines that already have a sound are left alone.
+Lines are matched by their exact text in dialog.tlk (UTF-8), among the lines of the
+speaker's own dialogue, so only lines from the components you have installed get voiced.
+Lines that already have a sound are left alone.
 
-Built from the s9-Everything voice pack (v1.05), filtered to this mod's own lines.
+Built from the remastered s9-CKR voice pack (v1.05).

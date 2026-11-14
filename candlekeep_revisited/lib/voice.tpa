@@ -1,8 +1,9 @@
 // AI voiced lines (custom component 6).
-// Adapted from the packaged mod s9-CandlekeepRevisitedv (VVE_Builder IE Voiceover Patcher v1.03).
-// Lines are matched by their exact text in dialog.tlk, so this works whichever
-// Candlekeep Revisited components are installed; lines from components that are
-// not installed are simply skipped. Lines that already have a sound are left alone.
+// Adapted from the packaged mod s9-CKR (VVE_Builder IE Voiceover Patcher v1.05).
+// Lines are matched by their exact text in dialog.tlk, among the speaker's own dialogue
+// (4th column of the mapping files), so this works whichever Candlekeep Revisited
+// components are installed; lines from components that are not installed are skipped.
+// Lines that already have a sound are left alone.
 
 DEFINE_ACTION_MACRO vo_attach BEGIN
   LOAD_TRA ~%tra_file%~
@@ -11,84 +12,297 @@ DEFINE_ACTION_MACRO vo_attach BEGIN
   ACTION_CLEAR_ARRAY want_res
   ACTION_CLEAR_ARRAY cand_count
   ACTION_CLEAR_ARRAY cand_ref
+  ACTION_CLEAR_ARRAY want_dlg
+  ACTION_CLEAR_ARRAY want_txt
+  ACTION_CLEAR_ARRAY dlg_loaded
+  ACTION_CLEAR_ARRAY dlg_n
+  ACTION_CLEAR_ARRAY dlg_sr
+  ACTION_CLEAR_ARRAY own_has
+  ACTION_CLEAR_ARRAY want_tcount
+  ACTION_CLEAR_ARRAY want_h
+  ACTION_CLEAR_ARRAY want_r
+  ACTION_CLEAR_ARRAY gcand_count
+  ACTION_CLEAR_ARRAY gcand_ref
 
   OUTER_SET exact = 0
+  OUTER_SET kept = 0
   OUTER_SET moved = 0
   OUTER_SET unresolved = 0
   OUTER_SET skipped = 0
   OUTER_SET tlk_total = NEXT_STRREF
 
-  // Pass 1: trust the remembered strref, but only if the text still matches.
+  OUTER_SET unk_unres = 0
+
+  // Pass 1: trust the remembered strref, but only if the text still matches and (when the
+  // speaker's dialog is known) the strref is one of that dialog's own NPC lines.
   COPY - ~%map_file%~ ~override~
-    READ_2DA_ENTRIES_NOW vo_map 3
+    READ_2DA_ENTRIES_NOW vo_map 4
 
     FOR (row = 0; row < vo_map; row = row + 1) BEGIN
       READ_2DA_ENTRY_FORMER vo_map row 0 strref
       READ_2DA_ENTRY_FORMER vo_map row 1 resref
       READ_2DA_ENTRY_FORMER vo_map row 2 tid
+      READ_2DA_ENTRY_FORMER vo_map row 3 dlg
 
       INNER_ACTION BEGIN
-        // Copy the file here, one at a time (like the vve mods do). A file WeiDU cannot
-        // load (antivirus lock, etc.) is retried once and then only logged, so a single
-        // bad file never stops the others.
-        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
-          ACTION_TRY
-            COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
-          WITH DEFAULT
-            LOG ~[VO Patcher] could not copy %resref%.wav~
+        // A line belongs to one speaker's dialog ("-" = unknown). If that dialog is not in this
+        // game (its mod is not installed) the line is left alone.
+        OUTER_SET known = 0
+        OUTER_SET owner_here = 1
+        ACTION_IF NOT (~%dlg%~ STRING_EQUAL ~-~) BEGIN
+          OUTER_SET known = 1
+          ACTION_IF NOT FILE_EXISTS_IN_GAME ~%dlg%.dlg~ BEGIN OUTER_SET owner_here = 0 END
+        END
+
+        // Read the speaker's dialog once: the strrefs of its NPC lines (states).
+        ACTION_IF (known = 1 AND owner_here = 1 AND NOT VARIABLE_IS_SET $dlg_loaded(~%dlg%~)) BEGIN
+          OUTER_SET $dlg_loaded(~%dlg%~) = 1
+          COPY_EXISTING ~%dlg%.dlg~ ~override~
+            SET dn = 0
+            READ_LONG 0x08 ns
+            READ_LONG 0x0C so
+            FOR (si = 0; si < ns; si += 1) BEGIN
+              READ_LONG (so + si * 16) ssr
+              PATCH_IF (ssr >= 0) BEGIN
+                PATCH_IF NOT VARIABLE_IS_SET $own_has(~%dlg%:%ssr%~) BEGIN
+                  SET $own_has(~%dlg%:%ssr%~) = 1
+                  SET $dlg_sr(~%dlg%~ ~%dn%~) = ssr
+                  SET dn += 1
+                END
+              END
+            END
+            SET $dlg_n(~%dlg%~) = dn
+          BUT_ONLY
+        END
+
+        ACTION_IF owner_here = 1 BEGIN
+          OUTER_SPRINT exp (AT ~%tid%~)
+          OUTER_SET have_hint = 0
+          ACTION_IF (strref > 0 AND strref < tlk_total) BEGIN
+            ACTION_GET_STRREF strref cur
+            ACTION_IF (~%cur%~ STRING_EQUAL ~%exp%~) BEGIN
+              ACTION_IF known = 0 BEGIN
+                OUTER_SET have_hint = 1
+              END ELSE BEGIN
+                ACTION_IF VARIABLE_IS_SET $own_has(~%dlg%:%strref%~) BEGIN OUTER_SET have_hint = 1 END
+              END
+            END
           END
-        END
-        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
-          ACTION_TRY
-            COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
-          WITH DEFAULT
-            LOG ~[VO Patcher] could not copy (2nd try) %resref%.wav~
+          // Never replace a sound the game already has (official audio, the vve mods, another voiceover
+          // pack): only a line with no sound, a silent placeholder (C0BLANK...), or this mod's own file
+          // from an earlier install is attached.
+          OUTER_SET keep_it = 0
+          ACTION_IF have_hint = 1 BEGIN
+            ACTION_GET_STRREF_S strref csnd
+            OUTER_SET c_free = 0
+            ACTION_IF (~%csnd%~ STRING_EQUAL ~~) BEGIN OUTER_SET c_free = 1 END
+            ACTION_IF (~%csnd%~ STRING_EQUAL ~%resref%~) BEGIN OUTER_SET c_free = 1 END
+            ACTION_IF (~%csnd%~ STRING_COMPARE_REGEXP ~.*[Bb][Ll][Aa][Nn][Kk].*~ = 0) BEGIN OUTER_SET c_free = 1 END
+            ACTION_IF (~%csnd%~ STRING_COMPARE_REGEXP ~.*[Ss][Ii][Ll][Ee][Nn].*~ = 0) BEGIN OUTER_SET c_free = 1 END
+            ACTION_IF (c_free = 0) BEGIN
+              LOG ~[VO Patcher] kept existing sound %csnd% on strref %strref% (not replaced by %resref%)~
+              OUTER_SET kept = kept + 1
+              OUTER_SET keep_it = 1
+            END
           END
-        END
-        OUTER_SPRINT exp (AT ~%tid%~)
-        OUTER_SET have_hint = 0
-        ACTION_IF (strref > 0 AND strref < tlk_total) BEGIN
-          ACTION_GET_STRREF strref cur
-          ACTION_IF (~%cur%~ STRING_EQUAL ~%exp%~) BEGIN OUTER_SET have_hint = 1 END
-        END
-        ACTION_IF have_hint = 1 BEGIN
-          STRING_SET_EVALUATE strref ~%cur%~ [%resref%]
-          OUTER_SET exact = exact + 1
-        END ELSE BEGIN
-          ACTION_IF VARIABLE_IS_SET $want_count(~%exp%~) BEGIN
-            OUTER_SET $want_count(~%exp%~) = $want_count(~%exp%~) + 1
+          ACTION_IF have_hint = 1 BEGIN
+            ACTION_IF keep_it = 0 BEGIN
+            // Copy the file here, one at a time (like the vve mods do). A file WeiDU cannot
+            // load (antivirus lock, etc.) is retried once and then only logged, so a single
+            // bad file never stops the others.
+            // Always copy (overwrite): an older file of the same name in override - left by an earlier
+            // install of this mod - must be replaced by the newly generated one, not kept.
+            ACTION_IF NOT VARIABLE_IS_SET $copied(~%resref%~) BEGIN
+              OUTER_SET $copied(~%resref%~) = 1
+              ACTION_TRY
+                COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
+              WITH DEFAULT
+                LOG ~[VO Patcher] could not copy %resref%.wav~
+              END
+            END
+            ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
+              ACTION_TRY
+                COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
+              WITH DEFAULT
+                LOG ~[VO Patcher] could not copy (2nd try) %resref%.wav~
+              END
+            END
+              STRING_SET_EVALUATE strref ~%cur%~ [%resref%]
+              OUTER_SET exact = exact + 1
+            END
           END ELSE BEGIN
-            OUTER_SET $want_count(~%exp%~) = 1
-            OUTER_TEXT_SPRINT $want_res(~%exp%~) ~%resref%~
+            OUTER_SPRINT key ~%dlg%|%exp%~
+            ACTION_IF VARIABLE_IS_SET $want_count(~%key%~) BEGIN
+              OUTER_SET $want_count(~%key%~) = $want_count(~%key%~) + 1
+            END ELSE BEGIN
+              OUTER_SET $want_count(~%key%~) = 1
+              OUTER_TEXT_SPRINT $want_res(~%key%~) ~%resref%~
+              OUTER_TEXT_SPRINT $want_dlg(~%key%~) ~%dlg%~
+              OUTER_TEXT_SPRINT $want_txt(~%key%~) ~%exp%~
+            END
+            OUTER_SET wi = $want_count(~%key%~) - 1
+            OUTER_SET $want_h(~%key%~ ~%wi%~) = strref
+            OUTER_TEXT_SPRINT $want_r(~%key%~ ~%wi%~) ~%resref%~
+            ACTION_IF known = 0 BEGIN OUTER_SET unk_unres = unk_unres + 1 END
+            OUTER_SET unresolved = unresolved + 1
+            // how many unresolved entries want this exact text (for the dialog.tlk fallback below)
+            ACTION_IF VARIABLE_IS_SET $want_tcount(~%exp%~) BEGIN
+              OUTER_SET $want_tcount(~%exp%~) = $want_tcount(~%exp%~) + 1
+            END ELSE BEGIN
+              OUTER_SET $want_tcount(~%exp%~) = 1
+            END
           END
-          OUTER_SET unresolved = unresolved + 1
         END
       END
     END
   BUT_ONLY
 
-  // Pass 2 (only if needed): find the moved/changed lines by their text.
+  // Pass 2 (only if needed): find the moved/changed lines by their text - inside the
+  // speaker's own dialog when it is known, and only for unknown speakers in the whole dialog.tlk.
+  // Fallback: a known speaker's line that is not in that dialog at all (e.g. EET_END merged the
+  // dialog into another file, or the pack was scanned before/after EET_END) is taken from the
+  // whole dialog.tlk when its text is there exactly once without a sound.
   ACTION_IF unresolved > 0 BEGIN
     OUTER_SET total = NEXT_STRREF
     OUTER_FOR (i = 0; i < total; i = i + 1) BEGIN
       ACTION_GET_STRREF i cur
-      ACTION_IF VARIABLE_IS_SET $want_count(~%cur%~) BEGIN
+      OUTER_SET w_unk = 0
+      OUTER_SET w_any = 0
+      ACTION_IF VARIABLE_IS_SET $want_count(~-|%cur%~) BEGIN OUTER_SET w_unk = 1 END
+      ACTION_IF VARIABLE_IS_SET $want_tcount(~%cur%~) BEGIN OUTER_SET w_any = 1 END
+      ACTION_IF (w_unk = 1 OR w_any = 1) BEGIN
         ACTION_GET_STRREF_S i snd
-        ACTION_IF (~%snd%~ STRING_EQUAL ~~) BEGIN
-          ACTION_IF VARIABLE_IS_SET $cand_count(~%cur%~) BEGIN
-            OUTER_SET $cand_count(~%cur%~) = $cand_count(~%cur%~) + 1
-          END ELSE BEGIN
-            OUTER_SET $cand_count(~%cur%~) = 1
-            OUTER_SET $cand_ref(~%cur%~) = i
+        OUTER_SET snd_free = 0
+        ACTION_IF (~%snd%~ STRING_EQUAL ~~) BEGIN OUTER_SET snd_free = 1 END
+        ACTION_IF (~%snd%~ STRING_COMPARE_REGEXP ~.*[Bb][Ll][Aa][Nn][Kk].*~ = 0) BEGIN OUTER_SET snd_free = 1 END
+        ACTION_IF (~%snd%~ STRING_COMPARE_REGEXP ~.*[Ss][Ii][Ll][Ee][Nn].*~ = 0) BEGIN OUTER_SET snd_free = 1 END
+        ACTION_IF (snd_free = 1) BEGIN
+          ACTION_IF (w_unk = 1) BEGIN
+            ACTION_IF VARIABLE_IS_SET $cand_count(~-|%cur%~) BEGIN
+              OUTER_SET $cand_count(~-|%cur%~) = $cand_count(~-|%cur%~) + 1
+            END ELSE BEGIN
+              OUTER_SET $cand_count(~-|%cur%~) = 1
+              OUTER_SET $cand_ref(~-|%cur%~) = i
+            END
+          END
+          ACTION_IF (w_any = 1) BEGIN
+            ACTION_IF VARIABLE_IS_SET $gcand_count(~%cur%~) BEGIN
+              OUTER_SET $gcand_count(~%cur%~) = $gcand_count(~%cur%~) + 1
+            END ELSE BEGIN
+              OUTER_SET $gcand_count(~%cur%~) = 1
+              OUTER_SET $gcand_ref(~%cur%~) = i
+            END
           END
         END
       END
     END
 
-    ACTION_PHP_EACH want_res AS txt => res BEGIN
-      ACTION_IF (VARIABLE_IS_SET $cand_count(~%txt%~) AND $cand_count(~%txt%~) = 1 AND $want_count(~%txt%~) = 1) BEGIN
-        OUTER_SET ref = $cand_ref(~%txt%~)
-        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%res%.wav~ BEGIN
+    ACTION_PHP_EACH want_res AS key => res BEGIN
+      OUTER_SPRINT dd $want_dlg(~%key%~)
+      OUTER_SPRINT txt $want_txt(~%key%~)
+      OUTER_SET ref = 0 - 1
+      OUTER_SET cands = 0
+      OUTER_SET handled = 0
+      ACTION_IF (~%dd%~ STRING_EQUAL ~-~) BEGIN
+        ACTION_IF VARIABLE_IS_SET $cand_count(~%key%~) BEGIN
+          OUTER_SET cands = $cand_count(~%key%~)
+          OUTER_SET ref = $cand_ref(~%key%~)
+        END
+      END ELSE BEGIN
+        ACTION_IF VARIABLE_IS_SET $dlg_n(~%dd%~) BEGIN
+          OUTER_SET dnn = $dlg_n(~%dd%~)
+          OUTER_FOR (k = 0; k < dnn; k = k + 1) BEGIN
+            OUTER_SET r = $dlg_sr(~%dd%~ ~%k%~)
+            ACTION_GET_STRREF r cur
+            ACTION_IF (~%cur%~ STRING_EQUAL ~%txt%~) BEGIN
+              ACTION_GET_STRREF_S r snd
+              OUTER_SET snd_free = 0
+              ACTION_IF (~%snd%~ STRING_EQUAL ~~) BEGIN OUTER_SET snd_free = 1 END
+              ACTION_IF (~%snd%~ STRING_COMPARE_REGEXP ~.*[Bb][Ll][Aa][Nn][Kk].*~ = 0) BEGIN OUTER_SET snd_free = 1 END
+              ACTION_IF (~%snd%~ STRING_COMPARE_REGEXP ~.*[Ss][Ii][Ll][Ee][Nn].*~ = 0) BEGIN OUTER_SET snd_free = 1 END
+              ACTION_IF (snd_free = 1) BEGIN
+                OUTER_SET cands = cands + 1
+                OUTER_SET ref = r
+                OUTER_SET $cref(~%cands%~) = r
+              END
+            END
+          END
+        END
+        // not in its recorded dialog at all (e.g. EET_END merged that dialog into another file):
+        // 1) each entry whose own remembered strref still has exactly this text and no sound gets it.
+        OUTER_SET handled = 0
+        ACTION_IF (cands = 0) BEGIN
+          OUTER_SET wc = $want_count(~%key%~)
+          OUTER_SET hits = 0
+          OUTER_FOR (e = 0; e < wc; e = e + 1) BEGIN
+            OUTER_SET h = $want_h(~%key%~ ~%e%~)
+            OUTER_SPRINT hr $want_r(~%key%~ ~%e%~)
+            ACTION_IF (h > 0 AND h < tlk_total) BEGIN
+              ACTION_GET_STRREF h hc
+              ACTION_IF (~%hc%~ STRING_EQUAL ~%txt%~) BEGIN
+                ACTION_GET_STRREF_S h hs
+                OUTER_SET snd_free = 0
+                ACTION_IF (~%hs%~ STRING_EQUAL ~~) BEGIN OUTER_SET snd_free = 1 END
+                ACTION_IF (~%hs%~ STRING_COMPARE_REGEXP ~.*[Bb][Ll][Aa][Nn][Kk].*~ = 0) BEGIN OUTER_SET snd_free = 1 END
+                ACTION_IF (~%hs%~ STRING_COMPARE_REGEXP ~.*[Ss][Ii][Ll][Ee][Nn].*~ = 0) BEGIN OUTER_SET snd_free = 1 END
+                ACTION_IF (snd_free = 1) BEGIN
+                  ACTION_IF NOT VARIABLE_IS_SET $copied(~%hr%~) BEGIN
+                    OUTER_SET $copied(~%hr%~) = 1
+                    ACTION_TRY
+                      COPY ~%MOD_FOLDER%/voice/wav/%hr%.wav~ ~override~
+                    WITH DEFAULT
+                      LOG ~[VO Patcher] could not copy %hr%.wav~
+                    END
+                  END
+                  STRING_SET_EVALUATE h ~%txt%~ [%hr%]
+                  OUTER_SET hits = hits + 1
+                END
+              END
+            END
+          END
+          ACTION_IF (hits > 0) BEGIN
+            OUTER_SET handled = 1
+            OUTER_SET moved = moved + hits
+            ACTION_IF (hits < wc) BEGIN       // the line is voiced; only a duplicate entry had nothing left to match
+              LOG ~[VO Patcher] voiced %hits% of %wc% entries for %res% by their remembered line (the others are duplicates)~
+            END
+          END
+        END
+        // 2) else a unique soundless match anywhere in dialog.tlk
+        ACTION_IF (cands = 0 AND handled = 0) BEGIN
+          ACTION_IF (VARIABLE_IS_SET $gcand_count(~%txt%~)) BEGIN
+            ACTION_IF ($gcand_count(~%txt%~) = 1 AND $want_tcount(~%txt%~) = 1) BEGIN
+              OUTER_SET cands = 1
+              OUTER_SET ref = $gcand_ref(~%txt%~)
+            END
+          END
+        END
+      END
+      // Same speaker, same text more than once (several copies in their dialog, or the pack lists the
+      // line twice for them): voice every soundless copy in that speaker's dialog with this recording.
+      ACTION_IF (handled = 0 AND cands > 0 AND NOT (~%dd%~ STRING_EQUAL ~-~) AND (cands > 1 OR $want_count(~%key%~) > 1)) BEGIN
+        ACTION_IF NOT VARIABLE_IS_SET $copied(~%res%~) BEGIN
+          OUTER_SET $copied(~%res%~) = 1
+          ACTION_TRY
+            COPY ~%MOD_FOLDER%/voice/wav/%res%.wav~ ~override~
+          WITH DEFAULT
+            LOG ~[VO Patcher] could not copy %res%.wav~
+          END
+        END
+        ACTION_IF (cands = 1) BEGIN
+          STRING_SET_EVALUATE ref ~%txt%~ [%res%]
+        END ELSE BEGIN
+          OUTER_FOR (c = 1; c <= cands; c = c + 1) BEGIN
+            OUTER_SET cr = $cref(~%c%~)
+            STRING_SET_EVALUATE cr ~%txt%~ [%res%]
+          END
+        END
+        OUTER_SET moved = moved + cands
+        OUTER_SET handled = 1
+      END
+      ACTION_IF (handled = 0 AND cands = 1 AND $want_count(~%key%~) = 1) BEGIN
+        ACTION_IF NOT VARIABLE_IS_SET $copied(~%res%~) BEGIN
+          OUTER_SET $copied(~%res%~) = 1
           ACTION_TRY
             COPY ~%MOD_FOLDER%/voice/wav/%res%.wav~ ~override~
           WITH DEFAULT
@@ -105,23 +319,31 @@ DEFINE_ACTION_MACRO vo_attach BEGIN
         STRING_SET_EVALUATE ref ~%txt%~ [%res%]
         OUTER_SET moved = moved + 1
       END ELSE BEGIN
-        LOG ~[VO Patcher] skipped %res%: its text was not found exactly once in dialog.tlk~
-        OUTER_SET skipped = skipped + 1
+        ACTION_IF (handled = 0) BEGIN
+          LOG ~[VO Patcher] skipped %res%: its text was not found exactly once among the lines of %dd% (nor once, without a sound, in dialog.tlk)~
+          OUTER_SET skipped = skipped + 1
+        END
       END
     END
   END
 
+  ACTION_IF kept > 0 BEGIN LOG ~[VO Patcher] left %kept% line(s) alone because they already have a sound~ END
   OUTER_SET patched = exact + moved
 END
 // vo_repair: runs after everything else, when antivirus has had time to finish scanning the
 // freshly written files. Copies any audio file that is still missing and counts what could not.
 DEFINE_ACTION_MACRO vo_repair BEGIN
   COPY - ~%map_file%~ ~override~
-    READ_2DA_ENTRIES_NOW vo_rmap 3
+    READ_2DA_ENTRIES_NOW vo_rmap 4
     FOR (row = 0; row < vo_rmap; row = row + 1) BEGIN
       READ_2DA_ENTRY_FORMER vo_rmap row 1 resref
+      READ_2DA_ENTRY_FORMER vo_rmap row 3 dlg
       INNER_ACTION BEGIN
-        ACTION_IF NOT FILE_EXISTS_IN_GAME ~%resref%.wav~ BEGIN
+        OUTER_SET owner_here = 1
+        ACTION_IF NOT (~%dlg%~ STRING_EQUAL ~-~) BEGIN
+          ACTION_IF NOT FILE_EXISTS_IN_GAME ~%dlg%.dlg~ BEGIN OUTER_SET owner_here = 0 END
+        END
+        ACTION_IF (owner_here = 1 AND NOT FILE_EXISTS_IN_GAME ~%resref%.wav~) BEGIN
           ACTION_TRY
             COPY ~%MOD_FOLDER%/voice/wav/%resref%.wav~ ~override~
           WITH DEFAULT
