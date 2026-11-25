@@ -16,13 +16,17 @@ ALWAYS
   OUTER_SPRINT "bg1_eet_symbol" AR
   OUTER_SPRINT "bg1_imoen" imoen
   OUTER_SPRINT "bg1_imoen_dlg" imoen2
+  OUTER_SPRINT "bg1_imoen_script" IMOEN
+  OUTER_SPRINT "bg1_imoen_kicked_dlg" IMOENP
   OUTER_SPRINT "wand_of_magic_missiles_itm" WAND12
   END
 
   ACTION_IF GAME_IS ~EET~ THEN BEGIN
   OUTER_SPRINT "bg1_eet_symbol" BG
   OUTER_SPRINT "bg1_imoen" imoen2
-  OUTER_SPRINT "bg1_imoen_dlg" imoen2j
+  OUTER_SPRINT "bg1_imoen_dlg" imoen2_
+  OUTER_SPRINT "bg1_imoen_script" IMOEN_
+  OUTER_SPRINT "bg1_imoen_kicked_dlg" IMOENP_
   OUTER_SPRINT "wand_of_magic_missiles_itm" WAND12_
   END
   

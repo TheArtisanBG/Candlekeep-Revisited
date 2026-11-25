@@ -68,15 +68,15 @@ CHAIN IMOEN C0CandleReImoenJoins.4
 EXIT
 
 CHAIN IF WEIGHT #-1 ~GlobalLT("TalkedToGorion","GLOBAL",1)
-Global("C0CandleReImoenJoins","GLOBAL",2)~ THEN IMOENP C0CandleReImoenKicked
+Global("C0CandleReImoenJoins","GLOBAL",2)~ THEN %bg1_imoen_kicked_dlg% C0CandleReImoenKicked
 ~Hey, what's up? You done hanging around, and it's time for you to go?~
 END
 ++ ~No, not yet. You can stay for a bit longer.~ DO ~JoinParty()~ EXIT
 ++ ~Yeah. See you around, Imoen.~ + C0CandleReImoenKicked.1
 
-CHAIN IMOENP C0CandleReImoenKicked.1
+CHAIN %bg1_imoen_kicked_dlg% C0CandleReImoenKicked.1
 ~Okay, well... I'll be heading off then. Maybe we'll see each other around some time? Bye.~
-DO ~SetDialog("%bg1_imoen%")
+DO ~SetDialog("IMOEN")
 SetGlobal("C0CandleReImoenJoins","GLOBAL",-1)
 EscapeAreaMove("%bg1_eet_symbol%2600",2843,1895,S)~ EXIT
 
@@ -162,6 +162,6 @@ EXIT
 
 ADD_STATE_TRIGGER GATEWARD 5 ~!InParty("%bg1_imoen%")~ 
 
-CHAIN IF WEIGHT #-1 ~InParty("%bg1_imoen%") NumInPartyGT(2)~ THEN GATEWARD C0CandleReGatewarden
+CHAIN IF WEIGHT #-1 ~InParty("%bg1_imoen%")~ THEN GATEWARD C0CandleReGatewarden
 ~Hello there! I thought I should tell you that Gorion has been looking to talk to <CHARNAME> and all of <PRO_HISHER> friends. You should go talk to Gorion as soon as possible.~
 EXIT
