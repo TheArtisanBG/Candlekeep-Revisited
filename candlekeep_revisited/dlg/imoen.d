@@ -162,6 +162,6 @@ EXIT
 
 ADD_STATE_TRIGGER GATEWARD 5 ~!InParty("%bg1_imoen%")~ 
 
-CHAIN IF WEIGHT #-1 ~InParty("%bg1_imoen%") NumInPartyGT(2)~ THEN GATEWARD C0CandleReGatewarden
+CHAIN IF WEIGHT #-1 ~InParty("%bg1_imoen%")~ THEN GATEWARD C0CandleReGatewarden
 ~Hello there! I thought I should tell you that Gorion has been looking to talk to <CHARNAME> and all of <PRO_HISHER> friends. You should go talk to Gorion as soon as possible.~
 EXIT
